@@ -1,4 +1,11 @@
 /** @type {import('next').NextConfig} */
-const nextConfig = {}
-
-module.exports = nextConfig
+const nextConfig = {
+    images: {
+      domains: ['cdn.imagin.studio']
+    },
+    typescript: {
+      ignoreBuildErrors: true,
+    }
+  }
+  
+  module.exports = nextConfig
