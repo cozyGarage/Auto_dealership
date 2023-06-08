@@ -1,4 +1,4 @@
-import { MouseEventHandler } from "react";
+import {Dispatch, MouseEventHandler, SetStateAction} from "react";
 
 export interface CustomButtonProps {
   title: string;
@@ -17,7 +17,7 @@ export interface SearchManufacturerProps {
 
 export interface CarProps {
   city_mpg: number;
-  class: string;
+  carClass: string;
   combination_mpg: number;
   cylinders: number;
   displacement: number;
@@ -46,9 +46,11 @@ export interface OptionProps {
 export interface CustomFilterProps {
   title: string;
   options: OptionProps[];
+  setFilter: Dispatch<SetStateAction<any>>
 }
 
 export interface ShowMoreProps {
   pageNumber: number;
   isNext: boolean;
+  setLimit: Dispatch<SetStateAction<number>>;
 }
