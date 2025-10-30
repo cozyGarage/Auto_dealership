@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 
 import { CarCard, CustomFilter, Hero, SearchBar, ShowMore } from '@/components'
 import { fetchCars } from '@/utils';
@@ -10,6 +10,7 @@ import Image from 'next/image';
 export default function Home() {
   const [allCars, setAllCars] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   // search states
   const [manufacturer, setManufacturer] = useState("");
@@ -22,8 +23,9 @@ export default function Home() {
   // pagination states
   const [limit, setLimit] = useState(10);
 
-  const getCars = async () => {
+  const getCars = useCallback(async () => {
     setLoading(true);
+    setError(null);
 
     try {
       const result = await fetchCars({
@@ -35,19 +37,20 @@ export default function Home() {
       });
   
       setAllCars(result);
-    } catch (error) {
-      console.log(error);
+    } catch (err) {
+      console.error('Error fetching cars:', err);
+      const errorMessage = err instanceof Error ? err.message : 'Failed to fetch cars. Please try again later.';
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
-  }
+  }, [manufacturer, year, fuel, limit, model]);
 
   useEffect(() => {
-    console.log(fuel, year, limit, manufacturer, model)
     getCars();
-  }, [fuel, year, limit, manufacturer, model])
+  }, [getCars])
 
-  const isDataEmpty = !Array.isArray(allCars) || allCars.length < 1 || !allCars;
+  const isDataEmpty = !Array.isArray(allCars) || allCars.length < 1;
   
   return (
     <main className="overflow-hidden">
@@ -68,10 +71,15 @@ export default function Home() {
           </div>
         </div>
 
-        {allCars && allCars.length > 0 ? (
+        {error ? (
+          <div className="home__error-container">
+            <h2 className="text-black text-xl font-bold">Oops, something went wrong</h2>
+            <p>{error}</p>
+          </div>
+        ) : !isDataEmpty ? (
           <section>
             <div className="home__cars-wrapper">
-            {allCars?.map((car, index: number) => (
+            {allCars.map((car, index: number) => (
                 <CarCard key={index} car={car} />
             ))}
             </div>
@@ -97,7 +105,7 @@ export default function Home() {
         ): (
           <div className="home__error-container">
               <h2 className="text-black text-xl font-bold">Oops, no results</h2>
-              {isDataEmpty && <p>No cars found.</p>}
+              <p>No cars found.</p>
           </div>
         )}
 
