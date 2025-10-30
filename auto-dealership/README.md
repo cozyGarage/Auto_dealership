@@ -2,7 +2,34 @@ This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
+
+Before running the application, you need to set up your environment variables:
+
+1. Copy the `.env.example` file to create a new `.env` file:
+```bash
+cp .env.example .env
+```
+
+2. Get your RapidAPI key:
+   - Sign up at [RapidAPI](https://rapidapi.com/)
+   - Subscribe to the [Cars by API-Ninjas](https://rapidapi.com/apininjas/api/cars-by-api-ninjas) API
+   - Copy your API key
+
+3. Add your API key to the `.env` file:
+```
+NEXT_PUBLIC_RAPIDAPI_KEY=your_actual_api_key_here
+```
+
+### Running the Development Server
+
+First, install the dependencies:
+
+```bash
+npm install
+```
+
+Then, run the development server:
 
 ```bash
 npm run dev

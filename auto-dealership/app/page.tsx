@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 
 import { CarCard, CustomFilter, Hero, SearchBar, ShowMore } from '@/components'
 import { fetchCars } from '@/utils';
@@ -22,7 +22,7 @@ export default function Home() {
   // pagination states
   const [limit, setLimit] = useState(10);
 
-  const getCars = async () => {
+  const getCars = useCallback(async () => {
     setLoading(true);
 
     try {
@@ -36,18 +36,18 @@ export default function Home() {
   
       setAllCars(result);
     } catch (error) {
-      console.log(error);
+      console.error('Error fetching cars:', error);
+      setAllCars([]);
     } finally {
       setLoading(false);
     }
-  }
+  }, [manufacturer, year, fuel, limit, model]);
 
   useEffect(() => {
-    console.log(fuel, year, limit, manufacturer, model)
     getCars();
-  }, [fuel, year, limit, manufacturer, model])
+  }, [getCars])
 
-  const isDataEmpty = !Array.isArray(allCars) || allCars.length < 1 || !allCars;
+  const isDataEmpty = !Array.isArray(allCars) || allCars.length < 1;
   
   return (
     <main className="overflow-hidden">
@@ -68,10 +68,10 @@ export default function Home() {
           </div>
         </div>
 
-        {allCars && allCars.length > 0 ? (
+        {!isDataEmpty ? (
           <section>
             <div className="home__cars-wrapper">
-            {allCars?.map((car, index: number) => (
+            {allCars.map((car, index: number) => (
                 <CarCard key={index} car={car} />
             ))}
             </div>
@@ -97,7 +97,7 @@ export default function Home() {
         ): (
           <div className="home__error-container">
               <h2 className="text-black text-xl font-bold">Oops, no results</h2>
-              {isDataEmpty && <p>No cars found.</p>}
+              <p>No cars found.</p>
           </div>
         )}
 

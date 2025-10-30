@@ -3,14 +3,25 @@ import { CarProps, FilterProps } from "@/types";
 export async function fetchCars(filters: FilterProps) {
   const { manufacturer, year, model, limit, fuel } = filters;
 
+  const apiKey = process.env.NEXT_PUBLIC_RAPIDAPI_KEY;
+  
+  if (!apiKey) {
+    throw new Error('NEXT_PUBLIC_RAPIDAPI_KEY is not configured. Please add it to your .env file.');
+  }
+
   const headers = {
-    'X-RapidAPI-Key':'KJwZZIJSFimshuivMSVGaiYzkRomp15f2vKjsnK4bKzuUzVLzA',
+    'X-RapidAPI-Key': apiKey,
     'X-RapidAPI-Host': 'cars-by-api-ninjas.p.rapidapi.com'
   }
 
-  const response = await fetch(`https://cars-by-api-ninjas.p.rapidapi.com/v1/cars?make=${manufacturer}&year=${year}&model=${model}&limit=${limit}&fuel_type=${fuel}`, {
-    headers: headers,
-  });
+  const response = await fetch(
+    `https://cars-by-api-ninjas.p.rapidapi.com/v1/cars?make=${manufacturer}&year=${year}&model=${model}&limit=${limit}&fuel_type=${fuel}`,
+    { headers }
+  );
+
+  if (!response.ok) {
+    throw new Error(`API request failed: ${response.status} ${response.statusText}`);
+  }
 
   const result = await response.json();
 
@@ -32,7 +43,7 @@ export const calculateCarRent = (city_mpg: number, year: number) => {
   return rentalRatePerDay.toFixed(0);
 };
 
-export const generateCarImageUrl = (car: CarProps, angle?: string) => {
+export const generateCarImageUrl = (car: CarProps, angle: string = '29') => {
   const url = new URL('https://cdn.imagin.studio/getimage');
 
   const { make, year, model } = car;
@@ -42,7 +53,7 @@ export const generateCarImageUrl = (car: CarProps, angle?: string) => {
   url.searchParams.append('modelFamily', model.split(' ')[0]);
   url.searchParams.append('zoomType', 'fullscreen');
   url.searchParams.append('modelYear', `${year}`);
-  url.searchParams.append('angle', `${angle}`);
+  url.searchParams.append('angle', angle);
 
   return `${url}`;
 }
