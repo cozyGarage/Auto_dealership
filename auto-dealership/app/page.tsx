@@ -10,6 +10,7 @@ import Image from 'next/image';
 export default function Home() {
   const [allCars, setAllCars] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   // search states
   const [manufacturer, setManufacturer] = useState("");
@@ -24,6 +25,7 @@ export default function Home() {
 
   const getCars = useCallback(async () => {
     setLoading(true);
+    setError(null);
 
     try {
       const result = await fetchCars({
@@ -35,9 +37,10 @@ export default function Home() {
       });
   
       setAllCars(result);
-    } catch (error) {
-      console.error('Error fetching cars:', error);
-      setAllCars([]);
+    } catch (err) {
+      console.error('Error fetching cars:', err);
+      const errorMessage = err instanceof Error ? err.message : 'Failed to fetch cars. Please try again later.';
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -68,7 +71,12 @@ export default function Home() {
           </div>
         </div>
 
-        {!isDataEmpty ? (
+        {error ? (
+          <div className="home__error-container">
+            <h2 className="text-black text-xl font-bold">Oops, something went wrong</h2>
+            <p>{error}</p>
+          </div>
+        ) : !isDataEmpty ? (
           <section>
             <div className="home__cars-wrapper">
             {allCars.map((car, index: number) => (
